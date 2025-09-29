@@ -37,12 +37,12 @@ pip install pandas openpyxl
 3. Tool starten:
 
 ```bash
-python staff_hours_analyzer_final.py
+python gui.py
 ```
 
 ## Testdaten
 
-Testdateien findest du im Ordner `example_data/` (optional).
+Testdateien findest du im Ordner `example_data/`
 
 ## Geplant
 
