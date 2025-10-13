@@ -8,7 +8,37 @@ import re
 from openpyxl import load_workbook
 from openpyxl.styles import Alignment
 
+
 def calculate_hourly_presence(file_path):
+    # --- Strukturprüfung ---
+    try:
+        wb = load_workbook(file_path, read_only=True)
+        sheet_names = wb.sheetnames
+    except Exception as e:
+        messagebox.showerror("Fehler", f"Datei konnte nicht geöffnet werden:\n{str(e)}")
+        return
+
+    # Erwartete Struktur
+    expected_sheet = "Alle Mitarbeiter"
+
+    if expected_sheet not in sheet_names:
+        # Fall 1: Personal-Einzelseiten-Variante erkennen
+        if any(name not in ["Übersicht", expected_sheet] for name in sheet_names):
+            messagebox.showerror(
+                "Falscher Exporttyp",
+                "Diese Datei scheint eine Mitarbeiter-Einzelblatt-Version zu sein.\n\n"
+                "Bitte verwende den Standardexport mit den Tabellenblättern:\n"
+                "• Übersicht\n• Alle Mitarbeiter"
+            )
+        else:
+            messagebox.showerror(
+                "Fehlendes Tabellenblatt",
+                f"Das Tabellenblatt '{expected_sheet}' wurde nicht gefunden.\n"
+                "Bitte wähle eine Datei mit dem korrekten Exportformat."
+            )
+        return
+    # -------------------------
+
     # Excel einlesen
     df = pd.read_excel(file_path, sheet_name="Alle Mitarbeiter", skiprows=6)
 
@@ -128,6 +158,7 @@ def calculate_hourly_presence(file_path):
     messagebox.showinfo("Fertig", f"Auswertung gespeichert:\n{export_path}")
     sys.exit()
 
+
 def main():
     root = tk.Tk()
     root.withdraw()
@@ -140,6 +171,7 @@ def main():
             calculate_hourly_presence(file_path)
         except Exception as e:
             messagebox.showerror("Fehler", f"Fehler bei der Verarbeitung:\n{str(e)}")
+
 
 if __name__ == "__main__":
     main()
